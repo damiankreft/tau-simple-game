@@ -22,8 +22,6 @@ namespace SimpleGame
                 MovablePosition = new Point(2, 0)
             };
             _board.FinishReached += B_FinishReached;
-
-            Start();
         }
 
         public void Start()
