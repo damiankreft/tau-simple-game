@@ -4,13 +4,12 @@ namespace SimpleGame
 {
     public class SimpleGame
     {
-        public event Action GameFinished;
-
-        public Point PlayerPosition { get; private set; }
-        public BoardParams BoardParameters { get; init; }
-
         private readonly Board _board;
         private bool _finished;
+        
+        public event Action GameFinished;
+        public Point PlayerPosition { get; private set; }
+        public BoardParams BoardParameters { get; init; }
 
         public SimpleGame(BoardParams boardParams, Point playerPosition)
         {
