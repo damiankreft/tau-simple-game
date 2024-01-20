@@ -4,8 +4,10 @@ namespace SimpleGame;
 
 public class Board : IMovableBoard
 {
+    private Point _movablePosition;
+    private readonly char[,] _board;
+    
     public event Action FinishReached;
-
     public BoardParams BoardParams { get; init; }
     public Point MovablePosition
     {
@@ -26,9 +28,6 @@ public class Board : IMovableBoard
             }
         }
     }
-    private Point _movablePosition;
-
-    private readonly char[,] _board;
 
     public Board(BoardParams boardParams)
     {
