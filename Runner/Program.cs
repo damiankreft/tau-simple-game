@@ -6,22 +6,25 @@ namespace Runner
     internal class Program
     {
         static void Main(string[] args)
-        {
-            var finishPos = new Point(2, 4);
-            var playerInitialPos = new Point(2, 0);
-            var boardSize = new Size(5, 5);
+        { 
+            var rng = new Random();
+            var boardSize = new Size(rng.Next(5, 10), rng.Next(5, 10));
+            var finishPos = new Point(rng.Next(0, boardSize.Height - 1), boardSize.Width - 1);
+            var playerInitialPos = new Point(rng.Next(0, boardSize.Height - 1), 0);
             var boardParams = new BoardParams(finishPos, boardSize);
-            boardParams.Obstacles = new List<Point>()
+
+            for (var i = 0; i < rng.Next(10, boardSize.Width * boardSize.Height / 3 * 2 - 2); i++)
             {
-                new Point(2, 1),
-                new Point(4, 1),
-                new Point(1, 4),
-                new Point(2, 3),
-                new Point(3, 0),
-                new Point(0, 3)
-            };
+                // otestowac generowanie Punktu początkowego i Przeszkód
+                var point = new Point(rng.Next(0, boardSize.Height - 1), rng.Next(0, boardSize.Width - 1));
+                if (point != playerInitialPos)
+                    boardParams.Obstacles.Add(point);
+            }
+
             var game = new SimpleGame.SimpleGame(boardParams, playerInitialPos);
             game.Start();
         }
     }
 }
+
+// Sprawdzic 50 razy czy nie poleci InvalidOperationExcception "Cannot move through obstacles" podczas uruchamiania gry

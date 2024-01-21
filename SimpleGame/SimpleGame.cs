@@ -4,12 +4,19 @@ namespace SimpleGame
 {
     public class SimpleGame
     {
+        private const string KEY_ARROW_LEFT = "LeftArrow";
+        private const string KEY_ARROW_RIGHT = "RightArrow";
+        private const string KEY_ARROW_UP = "UpArrow";
+        private const string KEY_ARROW_DOWN = "DownArrow";
+        private const string MESSAGE_ERRORS_NUM_2 = " errors so far.";
+        private const string MESSAGE_ERRORS_NUM_1 = "You've made ";
         private readonly Board _board;
-        private bool _finished;
+        public bool Finished { get; private set; } = false;
         
         public event Action GameFinished;
         public Point PlayerPosition { get; private set; }
         public BoardParams BoardParameters { get; init; }
+        public int HumanErrors { get; private set; }
 
         public SimpleGame(BoardParams boardParams, Point playerPosition)
         {
@@ -18,7 +25,7 @@ namespace SimpleGame
 
             _board = new(boardParams)
             {
-                MovablePosition = new Point(2, 0)
+                PlayerPosition = playerPosition
             };
             _board.FinishReached += B_FinishReached;
         }
@@ -26,52 +33,51 @@ namespace SimpleGame
         public void Start()
         {
             _board.Print();
-            while (!_finished)
+            while (!Finished)
             {
-                var val = Console.ReadKey();
+                Console.WriteLine($"{MESSAGE_ERRORS_NUM_1}{HumanErrors}{MESSAGE_ERRORS_NUM_2}");
+                var input = Console.ReadKey();
                 Console.Clear();
-                switch (val.Key.ToString())
+                var point = new Point();
+                switch (input.Key.ToString())
                 {
-                    case "LeftArrow":
-                        MoveLeft();
+                    case KEY_ARROW_LEFT:
+                        point = new Point(_board.PlayerPosition.X, _board.PlayerPosition.Y - 1);
                         break;
-                    case "RightArrow":
-                        MoveRight();
+                    case KEY_ARROW_RIGHT:
+                        point = new Point(_board.PlayerPosition.X, _board.PlayerPosition.Y + 1);
                         break;
-                    case "UpArrow":
-                        MoveUp();
+                    case KEY_ARROW_UP:
+                        point = new Point(_board.PlayerPosition.X - 1, _board.PlayerPosition.Y);
                         break;
-                    case "DownArrow":
-                        MoveDown();
+                    case KEY_ARROW_DOWN:
+                        point = new Point(_board.PlayerPosition.X + 1, _board.PlayerPosition.Y);
                         break;
                 }
+                Move(point);
                 _board.Print();
             }
         }
 
-        public void MoveDown()
+        public void Move(Point pos)
         {
-            _board.MovablePosition = new Point(_board.MovablePosition.X + 1, _board.MovablePosition.Y);
-        }
-
-        public void MoveUp()
-        {
-            _board.MovablePosition = new Point(_board.MovablePosition.X - 1, _board.MovablePosition.Y);
-        }
-
-        public void MoveRight()
-        {
-            _board.MovablePosition = new Point(_board.MovablePosition.X, _board.MovablePosition.Y + 1);
-        }
-
-        public void MoveLeft()
-        {
-            _board.MovablePosition = new Point(_board.MovablePosition.X, _board.MovablePosition.Y - 1);
+            try
+            {
+                _board.PlayerPosition = pos;
+            }
+            catch (InvalidOperationException ex)
+            {
+                if (ex.Message.Equals(ErrorsUtil.EX_INVALID_OPERATION_BOUNDARY)
+                    || ex.Message.Equals(ErrorsUtil.EX_INVALID_OPERATION_OBSTACLE))
+                    HumanErrors++;
+                else
+                    throw;
+            }
         }
 
         void B_FinishReached()
         {
-            _finished = true;
+            Finished = true;
             GameFinished?.Invoke();
         }
     }

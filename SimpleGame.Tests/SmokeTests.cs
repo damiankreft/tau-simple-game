@@ -10,5 +10,4 @@ public class SmokeTests
     {
         Assert.Pass("Smoke test works.");
     }
-
 }
