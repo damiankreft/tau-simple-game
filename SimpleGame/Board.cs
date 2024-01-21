@@ -2,23 +2,26 @@
 
 namespace SimpleGame;
 
-public class Board : IMovableBoard
+public class Board : IPlayable
 {
     private Point _movablePosition;
     private readonly char[,] _board;
-    
     public event Action FinishReached;
     public BoardParams BoardParams { get; init; }
-    public Point MovablePosition
+    public Point PlayerPosition
     {
-        get
-        {
-            return _movablePosition;
-        }
+        get { return _movablePosition; }
 
         set
         {
-            _board[_movablePosition.X, _movablePosition.Y] = Pictograms.FREE;
+            if (value.X < 0 || value.Y < 0 || value.X > BoardParams.Size.Height - 1 || value.Y > BoardParams.Size.Width - 1)
+                throw new InvalidOperationException(ErrorsUtil.EX_INVALID_OPERATION_BOUNDARY);
+
+            if (_board[value.X, value.Y] == Pictograms.OBSTACLE)
+                throw new InvalidOperationException(ErrorsUtil.EX_INVALID_OPERATION_OBSTACLE);
+
+            _board[_movablePosition.X, _movablePosition.Y] = Pictograms.WALKABLE;
+
             _movablePosition = value;
             _board[_movablePosition.X, _movablePosition.Y] = Pictograms.PLAYER;
 
@@ -31,6 +34,7 @@ public class Board : IMovableBoard
 
     public Board(BoardParams boardParams)
     {
+        // konstruktor do przetestowania - wyjscie poza zakres _board
         BoardParams = boardParams;
         _board = new char[BoardParams.Size.Height, BoardParams.Size.Width];
         Initialize();
@@ -45,7 +49,7 @@ public class Board : IMovableBoard
         {
             for (var col = 0; col < BoardParams.Size.Width; col++)
             {
-                _board[row, col] = Pictograms.FREE;
+                _board[row, col] = Pictograms.WALKABLE;
             }
         }
 
